@@ -11,7 +11,7 @@ COPY jsrpc /app/jsrpc
 RUN chmod +x /app/jsrpc
 
 # 暴露端口（如果应用监听端口）
-EXPOSE 1516
+EXPOSE 12080
 
 # 启动命令
 ENTRYPOINT ["./jsrpc"]
