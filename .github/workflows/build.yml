@@ -45,7 +45,7 @@ jobs:
         with:
           context: .
           push: true
-          file: ./Docker
+          file: ./Docker/Dockerfile
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/jsrpc:latest
             ${{ secrets.DOCKER_USERNAME }}/jsrpc:${{ github.sha }}
