@@ -1,14 +1,15 @@
-name: Build Go Linux AMD64
+name: Build Go Linux AMD64 and Push to Docker
 
 on:
   push:
-    branches: [ main, master ]  # 触发分支
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -16,16 +17,35 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'  # 指定Go版本
+          go-version: '1.21'
 
       - name: Build Linux AMD64
         run: |
           GOOS=linux GOARCH=amd64 go build -o jsrpc -v .
         env:
-          CGO_ENABLED: 0  # 禁用CGO，静态编译
+          CGO_ENABLED: 0
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: jsrpc-linux-amd64
           path: jsrpc
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/jsrpc:latest
+            ${{ secrets.DOCKER_USERNAME }}/jsrpc:${{ github.sha }}
+          platforms: linux/amd64
