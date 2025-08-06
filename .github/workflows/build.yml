@@ -1,0 +1,31 @@
+name: Build Go Linux AMD64
+
+on:
+  push:
+    branches: [ main, master ]  # 触发分支
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'  # 指定Go版本
+
+      - name: Build Linux AMD64
+        run: |
+          GOOS=linux GOARCH=amd64 go build -o jsrpc -v .
+        env:
+          CGO_ENABLED: 0  # 禁用CGO，静态编译
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jsrpc-linux-amd64
+          path: jsrpc
